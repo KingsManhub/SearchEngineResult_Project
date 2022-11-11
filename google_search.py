@@ -27,15 +27,32 @@ for j in search(Query, tld="co.in", num=num_of_result, stop=num_of_result, pause
 
 
 
-"""____________This section is for ranking___________ """
+"""____________This section is creating and writing plaintext file___________ """
 keywords = Query.split(" ")
 print(keywords)
-def order_of_relevance(title, num):
+def make_plain_text_file(title) -> None:
     with open(title, "r") as Read:
         for line in Read:
+            with open("plaintextfile.txt", "a") as plaintext:
+                plaintext.write("stripped"+title+"\n")
             r = urllib.request.urlopen(line).read()
             soup = BeautifulSoup(r, "lxml")
             with open("stripped_"+title, "w") as w:
                 w.write(soup.get_text())
 
-order_of_relevance(title, num_of_result)
+
+
+def query_search():
+    with open("plaintextfile.txt", "r") as plaintext:
+        Link = plaintext.readlines()
+        for eachLink in Link:
+            with open(eachLink.strip(), "r") as openLink:
+                content = openLink.readlines()
+                for keyword in keywords:
+                    count = 0
+                    for keyword in content.split():
+                        count += 1
+                        print(f"keyword{count} found")
+
+make_plain_text_file(title)
+query_search()
