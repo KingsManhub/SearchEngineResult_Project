@@ -3,10 +3,11 @@ from IPython.display import HTML
 import re
 import urllib.request
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 
 """____________This section returns the urls_______________"""
-try:
+try:    
     from googlesearch import search
 except ImportError:
     print("No module named 'google' found")
@@ -21,38 +22,46 @@ for i in Query:
         i = "_"
     title = title + i
 title = title+".txt"
-for j in search(Query, tld="co.in", num=num_of_result, stop=num_of_result, pause=2):
+
+def write_in_file(Link):
     with open (title, "a") as inside:
-        inside.writelines(str(j)+"\n")
+        inside.writelines(str(Link)+"\n")
+
+searcher = search(Query, tld="co.in", num=num_of_result, stop=num_of_result, pause=2)
+
+with ThreadPoolExecutor(max_workers=num_of_result) as executor:
+    executor.map(write_in_file, searcher)
 
 
 
 """____________This section is creating and writing plaintext file___________ """
 keywords = Query.split(" ")
-print(keywords)
 def make_plain_text_file(title) -> None:
     with open(title, "r") as Read:
-        for line in Read:
+        link_line = Read.readlines()
+        line_count = 0
+        for line in link_line:
             with open("plaintextfile.txt", "a") as plaintext:
-                plaintext.write("stripped"+title+"\n")
+                plaintext.write("stripped_"+str(line_count)+title+"\n")
             r = urllib.request.urlopen(line).read()
             soup = BeautifulSoup(r, "lxml")
-            with open("stripped_"+title, "w") as w:
+            with open("stripped_"+str(line_count)+title, "w") as w:
                 w.write(soup.get_text())
+            line_count += 1
+
+    query_search()
 
 
 
 def query_search():
     with open("plaintextfile.txt", "r") as plaintext:
-        Link = plaintext.readlines()
-        for eachLink in Link:
-            with open(eachLink.strip(), "r") as openLink:
-                content = openLink.readlines()
+        files = plaintext.readlines()
+        for eachfile in files:
+            with open(eachfile.strip(), "r") as openFile:
+                content = openFile.read()
                 for keyword in keywords:
-                    count = 0
-                    for keyword in content.split():
-                        count += 1
-                        print(f"keyword{count} found")
+                    print(keyword)
+            
 
 make_plain_text_file(title)
-query_search()
+# query_search()
