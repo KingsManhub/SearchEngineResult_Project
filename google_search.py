@@ -52,10 +52,12 @@ for i in range(0, len(list_link)):
     with open("stripped_"+str(i)+link_file_name, "r") as plain:
         whole_content = plain.read()
         summary = ""
-        for j in range(len(whole_content)//1.5):
-            if j == " " or i == "\n":
-                j = ""
+        for j in range(len(whole_content)//3):
+            if  whole_content[j] == "\t" or whole_content[j] == "\n" or whole_content[j] == None:
+                continue
             summary += whole_content[j]
+            if j == 50:
+                print("\n")
         with open("summary.txt", "a") as s:
             s.write(f"{i+1}. {list_link[i].strip()}:")
             s.write("\n\t"+summary+"...\n\n\n")
